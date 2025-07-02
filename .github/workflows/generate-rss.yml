@@ -22,9 +22,12 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run RSS generator
-        run: python rss_generator.py
-
+      - name: Run RajKaj scraper
+        run: python rajkaj_scraper.py
+      
+      - name: Run Dop Scraper
+        run: python dop_scraper.py
+        
       - name: Commit and push updated feed
         run: |
           git config user.name "github-actions[bot]"
