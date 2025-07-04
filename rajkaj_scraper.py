@@ -1,23 +1,23 @@
-# rss_generator.py
-
+# rajkaj_scraper.py
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime
+from datetime import datetime, UTC
 
 url = "https://rajkaj.rajasthan.gov.in"
 headers = {"User-Agent": "Mozilla/5.0"}
 
 response = requests.get(url, headers=headers)
 soup = BeautifulSoup(response.text, "html.parser")
-notification_list = soup.select("ul#notification li a")
+
+notifications = soup.select("ul#notification li a")
 
 rss_items = []
-for link in notification_list:
+for link in notifications:
     title = link.text.strip()
     href = link.get("href")
     if not href.startswith("http"):
         href = url + href
-    pub_date = datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')
+    pub_date = datetime.now(UTC).strftime('%a, %d %b %Y %H:%M:%S GMT')
 
     item = f"""
     <item>
@@ -29,14 +29,14 @@ for link in notification_list:
     """
     rss_items.append(item)
 
-rss_feed = f"""<?xml version="1.0" encoding="UTF-8"?>
+rss_feed = f"""<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
 <channel>
-    <title>RajKaj Rajasthan - Notifications</title>
+    <title>RajKaj Rajasthan Notifications</title>
     <link>{url}</link>
-    <description>Auto-generated feed of RajKaj updates</description>
+    <description>Auto-generated feed from RajKaj</description>
     <language>en-IN</language>
-    <lastBuildDate>{datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')}</lastBuildDate>
+    <lastBuildDate>{datetime.now(UTC).strftime('%a, %d %b %Y %H:%M:%S GMT')}</lastBuildDate>
     {''.join(rss_items)}
 </channel>
 </rss>"""
@@ -44,4 +44,4 @@ rss_feed = f"""<?xml version="1.0" encoding="UTF-8"?>
 with open("rajkaj_feed.xml", "w", encoding="utf-8") as f:
     f.write(rss_feed)
 
-print("✅ RSS feed updated.")
+print("✅ RajKaj RSS feed generated: rajkaj_feed.xml")
